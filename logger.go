@@ -147,8 +147,15 @@ func (l *logger) SetCustomOut(outPutt io.Writer) {
 
 // Prefix the log with a string
 func (l *logger) Prefix(format ...string) *logger {
-	l.prefixString = strings.Join(format, ": ")
-	return l
+	clone := logger{
+		LogLevel: l.LogLevel,
+		verbose:  l.verbose,
+		filePath: l.filePath,
+		std:      l.std,
+		stdout:   l.stdout,
+	}
+	clone.prefixString = strings.Join(format, ":")
+	return &clone
 }
 
 // End send finished signal to log
@@ -160,6 +167,7 @@ func (l *logger) End() {
 	if l.verbose {
 		l.LogF("END : %s\n", l.duration.String())
 	}
+	l.prefixString = ""
 }
 
 func (lr *logResult) TraceStack() {

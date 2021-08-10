@@ -204,8 +204,9 @@ func (l *logger) doLog(level LogLevel, a ...interface{}) {
 	}
 	var msg string
 	// to write to file
+
 	if l.prefixString != "" {
-		msg = fmt.Sprintf("%s : ", msg)
+		msg = fmt.Sprintf("%s =>", l.prefixString)
 	}
 	for _, v := range a {
 		msg = fmt.Sprintf("%s%s", msg, fmt.Sprint(v))

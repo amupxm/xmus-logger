@@ -125,11 +125,12 @@ func CreateLogger(LoggerOpts *LoggerOptions) Logger {
 	}
 
 	l := &logger{
-		LogLevel: LoggerOpts.LogLevel,
-		verbose:  LoggerOpts.Verbose,
-		filePath: LoggerOpts.FilePath,
-		std:      LoggerOpts.Std,
-		stdout:   LoggerOpts.Stdout,
+		LogLevel:     LoggerOpts.LogLevel,
+		verbose:      LoggerOpts.Verbose,
+		filePath:     LoggerOpts.FilePath,
+		std:          LoggerOpts.Std,
+		stdout:       LoggerOpts.Stdout,
+		prefixString: "",
 	}
 	t := time.Now()
 	l.time = &t

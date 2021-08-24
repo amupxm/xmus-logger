@@ -35,29 +35,7 @@ func TestLog(t *testing.T) {
 		wordToTest := fmt.Sprint(v)
 		logger.Log(v)
 		logger.End()
-		if wordToTest != b.String() {
-			t.Errorf("ERROR :: Expected  : " + wordToTest + " GOT : " + b.String())
-		}
-	}
-}
-
-func TestLogLn(t *testing.T) {
-	for _, v := range ValuesTotest {
-		var b bytes.Buffer
-		logger := logger.CreateLogger(
-			&logger.LoggerOptions{
-				LogLevel: logger.Trace,
-				Verbose:  false,
-				FilePath: "string",
-				Std:      true,
-				Stdout:   &b,
-			},
-		)
-		wordToTest := fmt.Sprint(v) + "\n"
-		logger.Logln(v)
-		logger.End()
-
-		if wordToTest != b.String() {
+		if fmt.Sprintf("%s\n", wordToTest) != b.String() {
 			t.Errorf("ERROR :: Expected  : " + wordToTest + " GOT : " + b.String())
 		}
 	}
@@ -91,7 +69,8 @@ func TestLogf(t *testing.T) {
 		wordToTest := fmt.Sprint(v[1:]...)
 		logger.LogF(v[0].(string), v[1:]...)
 		logger.End()
-		if wordToTest != b.String() {
+
+		if fmt.Sprintf("%s\n", wordToTest) != b.String() {
 			t.Errorf("ERROR :: Expected  : " + wordToTest + " GOT : " + b.String())
 		}
 	}

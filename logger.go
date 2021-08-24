@@ -40,53 +40,41 @@ type (
 		GetCaller() *logger
 
 		// Log logs a message at log level
-		Logln(a ...interface{}) LogResult
-		// Logln logs a message at log level to new line
 		Log(a ...interface{}) LogResult
 		// LogF logs a message at log level with string formater
 		LogF(format string, a ...interface{}) LogResult
 
 		// Alert logs a message at log level
-		Alertln(a ...interface{}) LogResult
-		// Alertln logs a message at log level to new line
 		Alert(a ...interface{}) LogResult
 		// AlertF logs a message at log level with string formater
 		AlertF(format string, a ...interface{}) LogResult
 
 		// Error logs a message at log level
 		Error(a ...interface{}) LogResult
-		// Errorln logs a message at log level to new line
-		Errorln(a ...interface{}) LogResult
 		// ErrorF logs a message at log level with string formater
 		ErrorF(format string, a ...interface{}) LogResult
 
 		// Highlight logs a message at log level
 		Highlight(a ...interface{}) LogResult
-		// Highlightln logs a message at log level to new line
-		Highlightln(a ...interface{}) LogResult
 		// HighlightF logs a message at log level with string formater
 		HighlightF(format string, a ...interface{}) LogResult
 
 		// Inform logs a message at log level
 		Inform(a ...interface{}) LogResult
-		// Informln logs a message at log level to new line
-		Informln(a ...interface{}) LogResult
 		// InformF logs a message at log level with string formater
 		InformF(format string, a ...interface{}) LogResult
 
 		// Trace logs a message at log level
 		Trace(a ...interface{}) LogResult
-		// Traceln logs a message at log level to new line
-		Traceln(a ...interface{}) LogResult
 		// TraceF logs a message at log level with string formater
 		TraceF(format string, a ...interface{}) LogResult
 
 		// Warn logs a message at log level
 		Warn(a ...interface{}) LogResult
-		// Warnln logs a message at log level to new line
-		Warnln(a ...interface{}) LogResult
 		// WarnF logs a message at log level with string formater
 		WarnF(format string, a ...interface{}) LogResult
+		// Set LogLevel
+		Level(level uint8) Logger
 	}
 	logResult struct {
 		logger *logger
@@ -136,8 +124,31 @@ func CreateLogger(LoggerOpts *LoggerOptions) Logger {
 	l.time = &t
 
 	if l.verbose {
-		l.doLog(Alert, "BEGIN : \n")
+		l.doLog(Alert, "BEGIN : ")
 	}
+	return l
+}
+
+func Begin() Logger {
+	l := &logger{
+		LogLevel:     6,
+		verbose:      true,
+		filePath:     "",
+		std:          true,
+		stdout:       os.Stdout,
+		prefixString: "",
+	}
+	t := time.Now()
+	l.time = &t
+
+	if l.verbose {
+		l.doLog(Alert, "BEGIN : ")
+	}
+	return l
+}
+
+func (l *logger) Level(level uint8) Logger {
+	l.LogLevel = LogLevel(level)
 	return l
 }
 
@@ -166,7 +177,7 @@ func (l *logger) End() {
 	)
 	l.duration = &d
 	if l.verbose {
-		l.LogF("END : %s\n", l.duration.String())
+		l.LogF("END : %s", l.duration.String())
 	}
 	l.prefixString = ""
 }
@@ -174,7 +185,7 @@ func (l *logger) End() {
 func (lr *logResult) TraceStack() {
 	stackSlice := make([]byte, 512)
 	s := runtime.Stack(stackSlice, false)
-	lr.logger.LogF("\n%s", stackSlice[0:s])
+	lr.logger.LogF("%s", stackSlice[0:s])
 }
 
 func (l *logger) getCaller() string {
@@ -212,7 +223,7 @@ func (l *logger) doLog(level LogLevel, a ...interface{}) {
 		msg = fmt.Sprintf("%s%s", msg, fmt.Sprint(v))
 
 	}
-	l.wStd(msg)
+	l.wStd(fmt.Sprintf("%s\n", msg))
 	// TODO make write to file
 
 }

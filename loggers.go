@@ -10,14 +10,6 @@ func (l *logger) Log(a ...interface{}) LogResult {
 	}
 }
 
-// Logln logs a message at log level to new line
-func (l *logger) Logln(a ...interface{}) LogResult {
-	l.doLog(Log, append(a, "\n")...)
-	return &logResult{
-		logger: l,
-	}
-}
-
 // LogF logs a message at log level with string formater
 func (l *logger) LogF(format string, a ...interface{}) LogResult {
 	l.doLog(Log, fmt.Sprintf(format, a...))
@@ -29,14 +21,6 @@ func (l *logger) LogF(format string, a ...interface{}) LogResult {
 // Alert logs a message at log level
 func (l *logger) Alert(a ...interface{}) LogResult {
 	l.doLog(Alert, a...)
-	return &logResult{
-		logger: l,
-	}
-}
-
-// Alertln logs a message at log level to new line
-func (l *logger) Alertln(a ...interface{}) LogResult {
-	l.doLog(Alert, append(a, "\n")...)
 	return &logResult{
 		logger: l,
 	}
@@ -58,14 +42,6 @@ func (l *logger) Error(a ...interface{}) LogResult {
 	}
 }
 
-// Errorln logs a message at log level to new line
-func (l *logger) Errorln(a ...interface{}) LogResult {
-	l.doLog(Error, append(a, "\n")...)
-	return &logResult{
-		logger: l,
-	}
-}
-
 // ErrorF logs a message at log level with string formater
 func (l *logger) ErrorF(format string, a ...interface{}) LogResult {
 	l.doLog(Error, fmt.Sprintf(format, a...))
@@ -77,14 +53,6 @@ func (l *logger) ErrorF(format string, a ...interface{}) LogResult {
 // Highlight logs a message at log level
 func (l *logger) Highlight(a ...interface{}) LogResult {
 	l.doLog(Highlight, a...)
-	return &logResult{
-		logger: l,
-	}
-}
-
-// Highlightln logs a message at log level to new line
-func (l *logger) Highlightln(a ...interface{}) LogResult {
-	l.doLog(Highlight, append(a, "\n")...)
 	return &logResult{
 		logger: l,
 	}
@@ -106,14 +74,6 @@ func (l *logger) Inform(a ...interface{}) LogResult {
 	}
 }
 
-// Informln logs a message at log level to new line
-func (l *logger) Informln(a ...interface{}) LogResult {
-	l.doLog(Inform, append(a, "\n")...)
-	return &logResult{
-		logger: l,
-	}
-}
-
 // InformF logs a message at log level with string formater
 func (l *logger) InformF(format string, a ...interface{}) LogResult {
 	l.doLog(Inform, fmt.Sprintf(format, a...))
@@ -130,14 +90,6 @@ func (l *logger) Trace(a ...interface{}) LogResult {
 	}
 }
 
-// Traceln logs a message at log level to new line
-func (l *logger) Traceln(a ...interface{}) LogResult {
-	l.doLog(Trace, append(a, "\n")...)
-	return &logResult{
-		logger: l,
-	}
-}
-
 // TraceF logs a message at log level with string formater
 func (l *logger) TraceF(format string, a ...interface{}) LogResult {
 	l.doLog(Trace, fmt.Sprintf(format, a...))
@@ -149,14 +101,6 @@ func (l *logger) TraceF(format string, a ...interface{}) LogResult {
 // Warn logs a message at log level
 func (l *logger) Warn(a ...interface{}) LogResult {
 	l.doLog(Warn, a...)
-	return &logResult{
-		logger: l,
-	}
-}
-
-// Warnln logs a message at log level to new line
-func (l *logger) Warnln(a ...interface{}) LogResult {
-	l.doLog(Warn, append(a, "\n")...)
 	return &logResult{
 		logger: l,
 	}

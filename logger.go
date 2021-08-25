@@ -28,6 +28,7 @@ type (
 		Stdout   io.Writer
 	}
 	Logger interface {
+		Begin() Logger
 		// use for add custom output
 		SetCustomOut(outPutt io.Writer)
 		// doLog send log to stdout or file
@@ -129,15 +130,8 @@ func CreateLogger(LoggerOpts *LoggerOptions) Logger {
 	return l
 }
 
-func Begin() Logger {
-	l := &logger{
-		LogLevel:     6,
-		verbose:      true,
-		filePath:     "",
-		std:          true,
-		stdout:       os.Stdout,
-		prefixString: "",
-	}
+func (l *logger) Begin() Logger {
+
 	t := time.Now()
 	l.time = &t
 

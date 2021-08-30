@@ -130,7 +130,8 @@ func CreateLogger(LoggerOpts *LoggerOptions) Logger {
 	return l
 }
 
-func (l *logger) Begin() Logger {
+func (l logger) Begin() Logger {
+	dup := l
 
 	t := time.Now()
 	l.time = &t
@@ -138,7 +139,7 @@ func (l *logger) Begin() Logger {
 	if l.verbose {
 		l.doLog(Alert, "BEGIN : ")
 	}
-	return l
+	return &dup
 }
 
 func (l *logger) Level(level uint8) Logger {

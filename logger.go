@@ -28,6 +28,7 @@ type (
 		Stdout   io.Writer
 	}
 	Logger interface {
+		BeginWithPrefix(format ...string) Logger
 		Begin() Logger
 		// use for add custom output
 		SetCustomOut(outPutt io.Writer)
@@ -153,7 +154,22 @@ func (l *logger) SetCustomOut(outPutt io.Writer) {
 }
 
 // Prefix the log with a string
-func (l *logger) Prefix(format ...string) *logger {
+func (l logger) BeginWithPrefix(format ...string) Logger {
+
+	dup := l
+	l.prefixString = strings.Join(format, ":")
+
+	t := time.Now()
+	l.time = &t
+
+	if l.verbose {
+		l.doLog(Alert, "BEGIN : ")
+	}
+	return &dup
+}
+
+// Prefix the log with a string
+func (l logger) Prefix(format ...string) *logger {
 	clone := logger{
 		LogLevel: l.LogLevel,
 		verbose:  l.verbose,

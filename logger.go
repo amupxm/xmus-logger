@@ -182,8 +182,9 @@ func (l logger) Prefix(format ...string) *logger {
 }
 
 // End send finished signal to log
-func (l *logger) End() {
-	if l != nil {
+func (l logger) End() {
+
+	if l.time != nil {
 		d := time.Since(
 			*l.time,
 		)
@@ -193,6 +194,7 @@ func (l *logger) End() {
 		}
 		l.prefixString = ""
 	}
+
 }
 
 func (lr *logResult) TraceStack() {

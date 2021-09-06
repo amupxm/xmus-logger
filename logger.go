@@ -156,16 +156,22 @@ func (l *logger) SetCustomOut(outPutt io.Writer) {
 // Prefix the log with a string
 func (l logger) BeginWithPrefix(format ...string) Logger {
 
-	dup := l
-	l.prefixString = strings.Join(format, ":")
+	clone := logger{
+		LogLevel: l.LogLevel,
+		verbose:  l.verbose,
+		filePath: l.filePath,
+		std:      l.std,
+		stdout:   l.stdout,
+	}
+	clone.prefixString = strings.Join(format, ":")
 
 	t := time.Now()
-	l.time = &t
+	clone.time = &t
 
-	if l.verbose {
+	if clone.verbose {
 		l.doLog(Alert, "BEGIN : ")
 	}
-	return &dup
+	return &clone
 }
 
 // Prefix the log with a string
@@ -221,7 +227,7 @@ func (l *logger) GetCaller() *logger {
 }
 
 // doLog send log to stdout or file
-func (l *logger) doLog(level LogLevel, a ...interface{}) {
+func (l logger) doLog(level LogLevel, a ...interface{}) {
 
 	// Check log level permission :
 	// permission Nothing is not allowed to log
@@ -230,7 +236,6 @@ func (l *logger) doLog(level LogLevel, a ...interface{}) {
 	}
 	var msg string
 	// to write to file
-
 	if l.prefixString != "" {
 		msg = fmt.Sprintf("%s =>", l.prefixString)
 	}

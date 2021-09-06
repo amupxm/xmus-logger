@@ -5,14 +5,13 @@ import logger "github.com/amupxm/xmus-logger"
 func main() {
 	logOptions := logger.LoggerOptions{
 		LogLevel: 6,
-		Verbose:  true,
+		Verbose:  false,
 		Std:      true,
 	}
 	log := logger.CreateLogger(&logOptions)
-
-	log.Level(uint8(logger.Log))
-	log.Log("log")
-	log.Alert("alert")
+	c := log.BeginWithPrefix("main")
+	c.Prefix("main").Alert(1)
+	c.Error(23)
 	log.End()
 
 }

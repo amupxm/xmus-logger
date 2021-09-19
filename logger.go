@@ -44,37 +44,37 @@ type (
 		// Log logs a message at log level
 		Log(v ...interface{}) LogResult
 		// Logf logs a message at log level with string formater
-		Logf(format string, v ...interface{}) LogResult
+		Logf(format string, v ...interface{})
 
 		// Alert logs a message at log level
 		Alert(v ...interface{}) LogResult
 		// Alertf logs a message at log level with string formater
-		Alertf(format string, v ...interface{}) LogResult
+		Alertf(format string, v ...interface{})
 
 		// Error logs a message at log level
 		Error(v ...interface{}) LogResult
 		// Errorf logs a message at log level with string formater
-		Errorf(format string, v ...interface{}) LogResult
+		Errorf(format string, v ...interface{})
 
 		// Highlight logs a message at log level
 		Highlight(v ...interface{}) LogResult
 		// Highlightf logs a message at log level with string formater
-		Highlightf(format string, v ...interface{}) LogResult
+		Highlightf(format string, v ...interface{})
 
 		// Inform logs a message at log level
 		Inform(v ...interface{}) LogResult
 		// Informf logs a message at log level with string formater
-		Informf(format string, v ...interface{}) LogResult
+		Informf(format string, v ...interface{})
 
 		// Trace logs a message at log level
 		Trace(v ...interface{}) LogResult
 		// Tracef logs a message at log level with string formater
-		Debugf(format string, v ...interface{}) LogResult
+		Debugf(format string, v ...interface{})
 
 		// Warn logs a message at log level
 		Warn(v ...interface{}) LogResult
 		// Warnf logs a message at log level with string formater
-		Warnf(format string, v ...interface{}) LogResult
+		Warnf(format string, v ...interface{})
 		// Set LogLevel
 		Level(level uint8) Logger
 	}

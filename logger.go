@@ -61,10 +61,10 @@ type (
 		// Highlightf logs a message at log level with string formater
 		Highlightf(format string, v ...interface{})
 
-		// Inform logs a message at log level
-		Inform(v ...interface{}) LogResult
-		// Informf logs a message at log level with string formater
-		Informf(format string, v ...interface{})
+		// Info logs a message at log level
+		Info(v ...interface{}) LogResult
+		// Infof logs a message at log level with string formater
+		Infof(format string, v ...interface{})
 
 		// Trace logs a message at log level
 		Trace(v ...interface{}) LogResult
@@ -94,7 +94,7 @@ const (
 	Error                     //2
 	Warn                      //3
 	Highlight                 //4
-	Inform                    //5
+	Info                      //5
 	Log                       //6
 	Trace                     //7
 )

@@ -58,17 +58,17 @@ func (l *logger) Highlightf(format string, a ...interface{}) {
 
 }
 
-// Inform logs a message at log level
-func (l *logger) Inform(a ...interface{}) LogResult {
-	l.doLog(Inform, a...)
+// Info logs a message at log level
+func (l *logger) Info(a ...interface{}) LogResult {
+	l.doLog(Info, a...)
 	return &logResult{
 		logger: l,
 	}
 }
 
-// Informf logs a message at log level with string formater
-func (l *logger) Informf(format string, a ...interface{}) {
-	l.doLog(Inform, fmt.Sprintf(format, a...))
+// Infof logs a message at log level with string formater
+func (l *logger) Infof(format string, a ...interface{}) {
+	l.doLog(Info, fmt.Sprintf(format, a...))
 
 }
 

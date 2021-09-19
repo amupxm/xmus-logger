@@ -18,7 +18,7 @@ log.LogF("📑 %s \n", "your first log")
 log.GetCaller().Alertln(" called me ")
 
 // Or Trace call stack
-log.Informln(" my cal stack is ").TraceStack()
+log.Infoln(" my cal stack is ").TraceStack()
 
 // Or Use prefix :
 prefixLogger := log.Prefix("Prefix", "log")
@@ -65,12 +65,12 @@ Highlightln(a ...interface{}) LogResult
 HighlightF(format string, a ...interface{}) LogResul
 
 
-// Inform logs a message at log level
-Inform(a ...interface{}) LogResult
-// Informln logs a message at log level to new line
-Informln(a ...interface{}) LogResult
-// InformF logs a message at log level with string formater
-InformF(format string, a ...interface{}) LogResul
+// Info logs a message at log level
+Info(a ...interface{}) LogResult
+// Infoln logs a message at log level to new line
+Infoln(a ...interface{}) LogResult
+// InfoF logs a message at log level with string formater
+InfoF(format string, a ...interface{}) LogResul
 
 
 // Trace logs a message at log level
@@ -99,7 +99,7 @@ WarnF(format string, a ...interface{}) LogResult
 |Error|1|prints only alert and error|
 |Warn|2|prints warn and all in level 1|
 |Highlight|3|prints Highlight and all in level 2|
-|Inform|4|Inform  and all in level 3|
+|Info|4|Info  and all in level 3|
 |Log|5|prints logs and all in level 4|
 |Trace|6|prints trace and all in level 5|
 

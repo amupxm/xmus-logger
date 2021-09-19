@@ -33,7 +33,7 @@ type (
 		// use for add custom output
 		SetCustomOut(outPutt io.Writer)
 		// doLog send log to stdout or file
-		doLog(level LogLevel, a ...interface{})
+		doLog(level LogLevel, v ...interface{})
 		// End send finished signal to log
 		End()
 		// Prefix the log with a string
@@ -42,39 +42,39 @@ type (
 		GetCaller() *logger
 
 		// Log logs a message at log level
-		Log(a ...interface{}) LogResult
+		Log(v ...interface{}) LogResult
 		// Logf logs a message at log level with string formater
-		Logf(format string, a ...interface{}) LogResult
+		Logf(format string, v ...interface{}) LogResult
 
 		// Alert logs a message at log level
-		Alert(a ...interface{}) LogResult
+		Alert(v ...interface{}) LogResult
 		// Alertf logs a message at log level with string formater
-		Alertf(format string, a ...interface{}) LogResult
+		Alertf(format string, v ...interface{}) LogResult
 
 		// Error logs a message at log level
-		Error(a ...interface{}) LogResult
+		Error(v ...interface{}) LogResult
 		// Errorf logs a message at log level with string formater
-		Errorf(format string, a ...interface{}) LogResult
+		Errorf(format string, v ...interface{}) LogResult
 
 		// Highlight logs a message at log level
-		Highlight(a ...interface{}) LogResult
+		Highlight(v ...interface{}) LogResult
 		// Highlightf logs a message at log level with string formater
-		Highlightf(format string, a ...interface{}) LogResult
+		Highlightf(format string, v ...interface{}) LogResult
 
 		// Inform logs a message at log level
-		Inform(a ...interface{}) LogResult
+		Inform(v ...interface{}) LogResult
 		// Informf logs a message at log level with string formater
-		Informf(format string, a ...interface{}) LogResult
+		Informf(format string, v ...interface{}) LogResult
 
 		// Trace logs a message at log level
-		Trace(a ...interface{}) LogResult
+		Trace(v ...interface{}) LogResult
 		// Tracef logs a message at log level with string formater
-		Debugf(format string, a ...interface{}) LogResult
+		Debugf(format string, v ...interface{}) LogResult
 
 		// Warn logs a message at log level
-		Warn(a ...interface{}) LogResult
+		Warn(v ...interface{}) LogResult
 		// Warnf logs a message at log level with string formater
-		Warnf(format string, a ...interface{}) LogResult
+		Warnf(format string, v ...interface{}) LogResult
 		// Set LogLevel
 		Level(level uint8) Logger
 	}
@@ -235,7 +235,7 @@ func (l *logger) GetCaller() *logger {
 }
 
 // doLog send log to stdout or file
-func (l logger) doLog(level LogLevel, a ...interface{}) {
+func (l logger) doLog(level LogLevel, v ...interface{}) {
 
 	// Check log level permission :
 	// permission Nothing is not allowed to log
@@ -247,7 +247,7 @@ func (l logger) doLog(level LogLevel, a ...interface{}) {
 	if l.prefixString != "" {
 		msg = fmt.Sprintf("[%s]  ", l.prefixString)
 	}
-	for _, v := range a {
+	for _, v := range v {
 		msg = fmt.Sprintf("%s%s", msg, fmt.Sprint(v))
 
 	}

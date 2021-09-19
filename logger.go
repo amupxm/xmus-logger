@@ -69,7 +69,7 @@ type (
 		// Trace logs a message at log level
 		Trace(a ...interface{}) LogResult
 		// Tracef logs a message at log level with string formater
-		Tracef(format string, a ...interface{}) LogResult
+		Debugf(format string, a ...interface{}) LogResult
 
 		// Warn logs a message at log level
 		Warn(a ...interface{}) LogResult

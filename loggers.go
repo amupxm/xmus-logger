@@ -91,7 +91,7 @@ func (l *logger) Trace(a ...interface{}) LogResult {
 }
 
 // Tracef logs a message at log level with string formater
-func (l *logger) Tracef(format string, a ...interface{}) LogResult {
+func (l *logger) Debugf(format string, a ...interface{}) LogResult {
 	l.doLog(Trace, fmt.Sprintf(format, a...))
 	return &logResult{
 		logger: l,

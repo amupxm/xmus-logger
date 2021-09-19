@@ -67,7 +67,7 @@ func TestLogf(t *testing.T) {
 			},
 		)
 		wordToTest := fmt.Sprint(v[1:]...)
-		logger.LogF(v[0].(string), v[1:]...)
+		logger.Logf(v[0].(string), v[1:]...)
 		logger.End()
 
 		if fmt.Sprintf("%s\n", wordToTest) != b.String() {

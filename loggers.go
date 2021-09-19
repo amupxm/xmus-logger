@@ -10,8 +10,8 @@ func (l *logger) Log(a ...interface{}) LogResult {
 	}
 }
 
-// LogF logs a message at log level with string formater
-func (l *logger) LogF(format string, a ...interface{}) LogResult {
+// Logf logs a message at log level with string formater
+func (l *logger) Logf(format string, a ...interface{}) LogResult {
 	l.doLog(Log, fmt.Sprintf(format, a...))
 	return &logResult{
 		logger: l,
@@ -26,8 +26,8 @@ func (l *logger) Alert(a ...interface{}) LogResult {
 	}
 }
 
-// AlertF logs a message at log level with string formater
-func (l *logger) AlertF(format string, a ...interface{}) LogResult {
+// Alertf logs a message at log level with string formater
+func (l *logger) Alertf(format string, a ...interface{}) LogResult {
 	l.doLog(Alert, fmt.Sprintf(format, a...))
 	return &logResult{
 		logger: l,
@@ -42,8 +42,8 @@ func (l *logger) Error(a ...interface{}) LogResult {
 	}
 }
 
-// ErrorF logs a message at log level with string formater
-func (l *logger) ErrorF(format string, a ...interface{}) LogResult {
+// Errorf logs a message at log level with string formater
+func (l *logger) Errorf(format string, a ...interface{}) LogResult {
 	l.doLog(Error, fmt.Sprintf(format, a...))
 	return &logResult{
 		logger: l,
@@ -58,8 +58,8 @@ func (l *logger) Highlight(a ...interface{}) LogResult {
 	}
 }
 
-// HighlightF logs a message at log level with string formater
-func (l *logger) HighlightF(format string, a ...interface{}) LogResult {
+// Highlightf logs a message at log level with string formater
+func (l *logger) Highlightf(format string, a ...interface{}) LogResult {
 	l.doLog(Highlight, fmt.Sprintf(format, a...))
 	return &logResult{
 		logger: l,
@@ -74,8 +74,8 @@ func (l *logger) Inform(a ...interface{}) LogResult {
 	}
 }
 
-// InformF logs a message at log level with string formater
-func (l *logger) InformF(format string, a ...interface{}) LogResult {
+// Informf logs a message at log level with string formater
+func (l *logger) Informf(format string, a ...interface{}) LogResult {
 	l.doLog(Inform, fmt.Sprintf(format, a...))
 	return &logResult{
 		logger: l,
@@ -90,8 +90,8 @@ func (l *logger) Trace(a ...interface{}) LogResult {
 	}
 }
 
-// TraceF logs a message at log level with string formater
-func (l *logger) TraceF(format string, a ...interface{}) LogResult {
+// Tracef logs a message at log level with string formater
+func (l *logger) Tracef(format string, a ...interface{}) LogResult {
 	l.doLog(Trace, fmt.Sprintf(format, a...))
 	return &logResult{
 		logger: l,
@@ -106,8 +106,8 @@ func (l *logger) Warn(a ...interface{}) LogResult {
 	}
 }
 
-// WarnF logs a message at log level with string formater
-func (l *logger) WarnF(format string, a ...interface{}) LogResult {
+// Warnf logs a message at log level with string formater
+func (l *logger) Warnf(format string, a ...interface{}) LogResult {
 	l.doLog(Warn, fmt.Sprintf(format, a...))
 	return &logResult{
 		logger: l,

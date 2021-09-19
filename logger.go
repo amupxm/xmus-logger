@@ -43,38 +43,38 @@ type (
 
 		// Log logs a message at log level
 		Log(a ...interface{}) LogResult
-		// LogF logs a message at log level with string formater
-		LogF(format string, a ...interface{}) LogResult
+		// Logf logs a message at log level with string formater
+		Logf(format string, a ...interface{}) LogResult
 
 		// Alert logs a message at log level
 		Alert(a ...interface{}) LogResult
-		// AlertF logs a message at log level with string formater
-		AlertF(format string, a ...interface{}) LogResult
+		// Alertf logs a message at log level with string formater
+		Alertf(format string, a ...interface{}) LogResult
 
 		// Error logs a message at log level
 		Error(a ...interface{}) LogResult
-		// ErrorF logs a message at log level with string formater
-		ErrorF(format string, a ...interface{}) LogResult
+		// Errorf logs a message at log level with string formater
+		Errorf(format string, a ...interface{}) LogResult
 
 		// Highlight logs a message at log level
 		Highlight(a ...interface{}) LogResult
-		// HighlightF logs a message at log level with string formater
-		HighlightF(format string, a ...interface{}) LogResult
+		// Highlightf logs a message at log level with string formater
+		Highlightf(format string, a ...interface{}) LogResult
 
 		// Inform logs a message at log level
 		Inform(a ...interface{}) LogResult
-		// InformF logs a message at log level with string formater
-		InformF(format string, a ...interface{}) LogResult
+		// Informf logs a message at log level with string formater
+		Informf(format string, a ...interface{}) LogResult
 
 		// Trace logs a message at log level
 		Trace(a ...interface{}) LogResult
-		// TraceF logs a message at log level with string formater
-		TraceF(format string, a ...interface{}) LogResult
+		// Tracef logs a message at log level with string formater
+		Tracef(format string, a ...interface{}) LogResult
 
 		// Warn logs a message at log level
 		Warn(a ...interface{}) LogResult
-		// WarnF logs a message at log level with string formater
-		WarnF(format string, a ...interface{}) LogResult
+		// Warnf logs a message at log level with string formater
+		Warnf(format string, a ...interface{}) LogResult
 		// Set LogLevel
 		Level(level uint8) Logger
 	}
@@ -155,7 +155,15 @@ func (l *logger) SetCustomOut(outPutt io.Writer) {
 
 // Prefix the log with a string
 func (l logger) BeginWithPrefix(format ...string) Logger {
+	colorReset := "\033[0m"
 
+	colorRed := "\033[31m"
+	// colorGreen := "\033[32m"
+	// colorYellow := "\033[33m"
+	// colorBlue := "\033[34m"
+	// colorPurple := "\033[35m"
+	// colorCyan := "\033[36m"
+	// colorWhite := "\033[37m"
 	clone := logger{
 		LogLevel: l.LogLevel,
 		verbose:  l.verbose,
@@ -164,7 +172,7 @@ func (l logger) BeginWithPrefix(format ...string) Logger {
 		stdout:   l.stdout,
 	}
 	clone.prefixString = strings.Join(format, ":")
-
+	clone.prefixString = fmt.Sprintf("%s%s%s", colorRed, clone.prefixString, colorReset)
 	t := time.Now()
 	clone.time = &t
 
@@ -196,7 +204,7 @@ func (l logger) End() {
 		)
 		l.duration = &d
 		if l.verbose {
-			l.LogF("END : %s", l.duration.String())
+			l.Logf("END : %s", l.duration.String())
 		}
 		l.prefixString = ""
 	}
@@ -206,7 +214,7 @@ func (l logger) End() {
 func (lr *logResult) TraceStack() {
 	stackSlice := make([]byte, 512)
 	s := runtime.Stack(stackSlice, false)
-	lr.logger.LogF("%s", stackSlice[0:s])
+	lr.logger.Logf("%s", stackSlice[0:s])
 }
 
 func (l *logger) getCaller() string {
@@ -222,7 +230,7 @@ func (l *logger) getCaller() string {
 
 // GetCaller return the caller of the log
 func (l *logger) GetCaller() *logger {
-	l.LogF("%s :: ", l.getCaller())
+	l.Logf("%s :: ", l.getCaller())
 	return l
 }
 
@@ -237,7 +245,7 @@ func (l logger) doLog(level LogLevel, a ...interface{}) {
 	var msg string
 	// to write to file
 	if l.prefixString != "" {
-		msg = fmt.Sprintf("%s =>", l.prefixString)
+		msg = fmt.Sprintf("[%s]  ", l.prefixString)
 	}
 	for _, v := range a {
 		msg = fmt.Sprintf("%s%s", msg, fmt.Sprint(v))

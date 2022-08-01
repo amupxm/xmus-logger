@@ -7,6 +7,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/reiver/go-xim"
 )
 
 type (
@@ -19,6 +21,7 @@ type (
 		duration     *time.Duration
 		prefixString string
 		stdout       io.Writer
+		traceCode    string
 	}
 	LoggerOptions struct {
 		LogLevel LogLevel
@@ -132,15 +135,7 @@ func CreateLogger(LoggerOpts *LoggerOptions) Logger {
 }
 
 func (l logger) Begin() Logger {
-	dup := l
-
-	t := time.Now()
-	l.time = &t
-
-	if l.verbose {
-		l.doLog(Alert, "BEGIN : ")
-	}
-	return &dup
+	return l.BeginWithPrefix("")
 }
 
 func (l *logger) Level(level uint8) Logger {
@@ -153,25 +148,37 @@ func (l *logger) SetCustomOut(outPutt io.Writer) {
 	l.stdout = outPutt
 }
 
+func createUID() string {
+	var x = xim.Generate()
+	return x.String()
+}
+
 // Prefix the log with a string
 func (l logger) BeginWithPrefix(format ...string) Logger {
 	colorReset := "\033[0m"
 
 	colorRed := "\033[31m"
-	// colorGreen := "\033[32m"
 	// colorYellow := "\033[33m"
 	// colorBlue := "\033[34m"
 	// colorPurple := "\033[35m"
 	// colorCyan := "\033[36m"
 	// colorWhite := "\033[37m"
+
 	clone := logger{
-		LogLevel: l.LogLevel,
-		verbose:  l.verbose,
-		filePath: l.filePath,
-		std:      l.std,
-		stdout:   l.stdout,
+		LogLevel:  l.LogLevel,
+		verbose:   l.verbose,
+		filePath:  l.filePath,
+		std:       l.std,
+		stdout:    l.stdout,
+		traceCode: createUID(),
 	}
-	clone.prefixString = strings.Join(format, ":")
+	var tmpF []string
+	for _, v := range format {
+		v = strings.ToUpper(v)
+		sv := strings.Split(v, "/")
+		tmpF = append(tmpF, sv...)
+	}
+	clone.prefixString = strings.Join(tmpF, ":")
 	clone.prefixString = fmt.Sprintf("%s%s%s", colorRed, clone.prefixString, colorReset)
 	t := time.Now()
 	clone.time = &t
@@ -236,7 +243,8 @@ func (l *logger) GetCaller() *logger {
 
 // doLog send log to stdout or file
 func (l logger) doLog(level LogLevel, v ...interface{}) {
-
+	colorReset := "\033[0m"
+	colorGreen := "\033[32m"
 	// Check log level permission :
 	// permission Nothing is not allowed to log
 	if l.LogLevel <= Nothing || level > l.LogLevel {
@@ -245,11 +253,13 @@ func (l logger) doLog(level LogLevel, v ...interface{}) {
 	var msg string
 	// to write to file
 	if l.prefixString != "" {
-		msg = fmt.Sprintf("[%s]  ", l.prefixString)
+		msg = fmt.Sprintf("[%s]", l.prefixString)
+	}
+	if l.traceCode != "" {
+		msg = fmt.Sprintf("%s[%s]", msg, fmt.Sprintf("%s%s%s", colorGreen, l.traceCode, colorReset))
 	}
 	for _, v := range v {
 		msg = fmt.Sprintf("%s%s", msg, fmt.Sprint(v))
-
 	}
 	l.wStd(fmt.Sprintf("%s\n", msg))
 	// TODO make write to file

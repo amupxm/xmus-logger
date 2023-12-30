@@ -22,70 +22,69 @@ type logger struct {
 	traceCode    string
 	whitelist    []string
 }
-
-type (
-	Options struct {
-		LogLevel LogLevel
-		Verbose  bool
-		FilePath string
-		Std      bool
-		Stdout   io.Writer
-	}
-	Logger interface {
-		BeginWithPrefix(format ...string) Logger
-		Begin() Logger
-		//SetCustomOut use for add custom output
-		SetCustomOut(outPutt io.Writer)
-		// doLog send log to stdout or file
-		doLog(level LogLevel, v ...interface{})
-		// End send finished signal to log
-		End()
-		// Prefix the log with a string
-		Prefix(format ...string) *logger
-		// GetCaller return the caller of the log
-		GetCaller() *logger
-		// Log logs a message at log level
-		Log(v ...interface{}) LogResult
-		// Logf logs a message at log level with string formater
-		Logf(format string, v ...interface{})
-		// Alert logs a message at log level
-		Alert(v ...interface{}) LogResult
-		// Alertf logs a message at log level with string formater
-		Alertf(format string, v ...interface{})
-		// Error logs a message at log level
-		Error(v ...interface{}) LogResult
-		// Errorf logs a message at log level with string formater
-		Errorf(format string, v ...interface{})
-		// Highlight logs a message at log level
-		Highlight(v ...interface{}) LogResult
-		// Highlightf logs a message at log level with string formater
-		Highlightf(format string, v ...interface{})
-		// Info logs a message at log level
-		Info(v ...interface{}) LogResult
-		// Infof logs a message at log level with string formater
-		Infof(format string, v ...interface{})
-		// Trace logs a message at log level
-		Trace(v ...interface{}) LogResult
-		// Tracef logs a message at log level with string formater
-		Debugf(format string, v ...interface{})
-		// Warn logs a message at log level
-		Warn(v ...interface{}) LogResult
-		// Warnf logs a message at log level with string formater
-		Warnf(format string, v ...interface{})
-		// Set LogLevel
-		Level(level uint8) Logger
-		// Set custom whitelist for development only
-		AddToWhitelist(prefix ...string)
-	}
-	logResult struct {
-		logger *logger
-	}
-	LogResult interface {
-		// TraceStack trace the stack of the log caller
-		TraceStack()
-	}
-	LogLevel int
-)
+type Options struct {
+	LogLevel LogLevel
+	Verbose  bool
+	FilePath string
+	Std      bool
+	Stdout   io.Writer
+	//you can set WhiteList to avoid other prefixes to log
+	WhiteList []string
+}
+type Logger interface {
+	BeginWithPrefix(format ...string) Logger
+	Begin() Logger
+	//SetCustomOut use for add custom output
+	SetCustomOut(outPutt io.Writer)
+	// doLog send log to stdout or file
+	doLog(level LogLevel, v ...interface{})
+	// End send finished signal to log
+	End()
+	// Prefix the log with a string
+	Prefix(format ...string) *logger
+	// GetCaller return the caller of the log
+	GetCaller() *logger
+	// Log logs a message at log level
+	Log(v ...interface{}) LogResult
+	// Logf logs a message at log level with string formater
+	Logf(format string, v ...interface{})
+	// Alert logs a message at log level
+	Alert(v ...interface{}) LogResult
+	// Alertf logs a message at log level with string formater
+	Alertf(format string, v ...interface{})
+	// Error logs a message at log level
+	Error(v ...interface{}) LogResult
+	// Errorf logs a message at log level with string formater
+	Errorf(format string, v ...interface{})
+	// Highlight logs a message at log level
+	Highlight(v ...interface{}) LogResult
+	// Highlightf logs a message at log level with string formater
+	Highlightf(format string, v ...interface{})
+	// Info logs a message at log level
+	Info(v ...interface{}) LogResult
+	// Infof logs a message at log level with string formater
+	Infof(format string, v ...interface{})
+	// Trace logs a message at log level
+	Trace(v ...interface{}) LogResult
+	// Tracef logs a message at log level with string formater
+	Debugf(format string, v ...interface{})
+	// Warn logs a message at log level
+	Warn(v ...interface{}) LogResult
+	// Warnf logs a message at log level with string formater
+	Warnf(format string, v ...interface{})
+	// Set LogLevel
+	Level(level uint8) Logger
+	// Set custom whitelist for development only
+	AddToWhitelist(prefix ...string)
+}
+type logResult struct {
+	logger *logger
+}
+type LogResult interface {
+	// TraceStack trace the stack of the log caller
+	TraceStack()
+}
+type LogLevel int
 
 const (
 	Nothing LogLevel = iota

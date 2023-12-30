@@ -11,19 +11,19 @@ import (
 	"github.com/reiver/go-xim"
 )
 
+type logger struct {
+	time         *time.Time
+	LogLevel     LogLevel
+	verbose      bool
+	std          bool
+	duration     *time.Duration
+	prefixString string
+	stdout       io.Writer
+	traceCode    string
+	whitelist    []string
+}
+
 type (
-	logger struct {
-		time         *time.Time
-		LogLevel     LogLevel
-		verbose      bool
-		std          bool
-		filePath     string
-		duration     *time.Duration
-		prefixString string
-		stdout       io.Writer
-		traceCode    string
-		blacklist    []string
-	}
 	Options struct {
 		LogLevel LogLevel
 		Verbose  bool
@@ -88,14 +88,14 @@ type (
 )
 
 const (
-	Nothing   LogLevel = iota //0
-	Alert                     //1
-	Error                     //2
-	Warn                      //3
-	Highlight                 //4
-	Info                      //5
-	Log                       //6
-	Trace                     //7
+	Nothing LogLevel = iota
+	Alert
+	Error
+	Warn
+	Highlight
+	Info
+	Log
+	Trace
 )
 
 func CreateLogger(LoggerOpts *Options) Logger {
@@ -116,7 +116,6 @@ func CreateLogger(LoggerOpts *Options) Logger {
 	l := &logger{
 		LogLevel:     LoggerOpts.LogLevel,
 		verbose:      LoggerOpts.Verbose,
-		filePath:     LoggerOpts.FilePath,
 		std:          LoggerOpts.Std,
 		stdout:       LoggerOpts.Stdout,
 		prefixString: "",
@@ -150,7 +149,7 @@ func createUID() string {
 }
 
 func (l *logger) AddToWhitelist(prefix ...string) {
-	l.blacklist = append(l.blacklist, prefix...)
+	l.whitelist = append(l.whitelist, prefix...)
 }
 
 // BeginWithPrefix the log with a string
@@ -168,7 +167,6 @@ func (l logger) BeginWithPrefix(format ...string) Logger {
 	clone := logger{
 		LogLevel:  l.LogLevel,
 		verbose:   l.verbose,
-		filePath:  l.filePath,
 		std:       l.std,
 		stdout:    l.stdout,
 		traceCode: createUID(),
@@ -195,7 +193,6 @@ func (l logger) Prefix(format ...string) *logger {
 	clone := logger{
 		LogLevel: l.LogLevel,
 		verbose:  l.verbose,
-		filePath: l.filePath,
 		std:      l.std,
 		stdout:   l.stdout,
 	}
@@ -256,8 +253,8 @@ func (l logger) doLog(level LogLevel, v ...interface{}) {
 	// to write to file
 
 	if l.prefixString != "" {
-		if l.blacklist != nil {
-			for _, v := range l.blacklist {
+		if l.whitelist != nil {
+			for _, v := range l.whitelist {
 				if fmt.Sprintf("%s%s%s", colorRed, strings.ToUpper(v), colorReset) == l.prefixString {
 					return
 				}

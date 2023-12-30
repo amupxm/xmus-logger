@@ -24,7 +24,7 @@ func TestLog(t *testing.T) {
 	for _, v := range ValuesTotest {
 		var b bytes.Buffer
 		logger := logger.CreateLogger(
-			&logger.LoggerOptions{
+			&logger.Options{
 				LogLevel: logger.Trace, // max log level
 				Verbose:  false,
 				FilePath: "string",
@@ -58,7 +58,7 @@ func TestLogf(t *testing.T) {
 	for _, v := range testCases {
 		var b bytes.Buffer
 		logger := logger.CreateLogger(
-			&logger.LoggerOptions{
+			&logger.Options{
 				LogLevel: logger.Trace,
 				Verbose:  false,
 				FilePath: "string",

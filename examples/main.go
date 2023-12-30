@@ -1,17 +1,24 @@
 package main
 
-import logger "github.com/amupxm/xmus-logger"
+import (
+	"time"
+
+	logger "github.com/amupxm/xmus-logger"
+)
 
 func main() {
-	logOptions := logger.LoggerOptions{
+	logOptions := logger.Options{
 		LogLevel: 6,
-		Verbose:  false,
+		Verbose:  true,
 		Std:      true,
 	}
 	log := logger.CreateLogger(&logOptions)
 	c := log.BeginWithPrefix("main")
-	c.Prefix("main").Alert(1)
-	c.Error(23)
+	c.Errorf("asdasd %s", "asdasd")
+	time.Sleep(time.Second * 4)
+	c.GetCaller()
+	c.Errorf("asdasd %s", "asdasd")
+
 	log.End()
 
 }

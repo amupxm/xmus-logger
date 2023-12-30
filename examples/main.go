@@ -15,9 +15,13 @@ func main() {
 	log := logger.CreateLogger(&logOptions)
 	c := log.BeginWithPrefix("main")
 	c.Errorf("asdasd %s", "asdasd")
-	time.Sleep(time.Second * 4)
+	time.Sleep(time.Second * 1)
 	c.GetCaller()
 	c.Errorf("asdasd %s", "asdasd")
+	c2 := log.BeginWithPrefix("main2")
+	c2.AddToWhitelist("main2")
+
+	c2.Errorf("asdasd %s", "asdasd")
 
 	log.End()
 

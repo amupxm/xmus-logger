@@ -22,6 +22,7 @@ type (
 		prefixString string
 		stdout       io.Writer
 		traceCode    string
+		blacklist    []string
 	}
 	Options struct {
 		LogLevel LogLevel
@@ -73,6 +74,8 @@ type (
 		Warnf(format string, v ...interface{})
 		// Set LogLevel
 		Level(level uint8) Logger
+		// Set custom whitelist for development only
+		AddToWhitelist(prefix ...string)
 	}
 	logResult struct {
 		logger *logger
@@ -136,7 +139,7 @@ func (l *logger) Level(level uint8) Logger {
 	return l
 }
 
-//SetCustomOut use for add custom output
+// SetCustomOut use for add custom output
 func (l *logger) SetCustomOut(outPutt io.Writer) {
 	l.stdout = outPutt
 }
@@ -146,11 +149,16 @@ func createUID() string {
 	return x.String()
 }
 
+func (l *logger) AddToWhitelist(prefix ...string) {
+	l.blacklist = append(l.blacklist, prefix...)
+}
+
 // BeginWithPrefix the log with a string
 func (l logger) BeginWithPrefix(format ...string) Logger {
 	colorReset := "\033[0m"
 
 	colorRed := "\033[31m"
+
 	// colorYellow := "\033[33m"
 	// colorBlue := "\033[34m"
 	// colorPurple := "\033[35m"
@@ -237,6 +245,7 @@ func (l *logger) GetCaller() *logger {
 // doLog send log to stdout or file
 func (l logger) doLog(level LogLevel, v ...interface{}) {
 	colorReset := "\033[0m"
+	colorRed := "\033[31m"
 	colorGreen := "\033[32m"
 	// Check log level permission :
 	// permission Nothing is not allowed to log
@@ -245,7 +254,15 @@ func (l logger) doLog(level LogLevel, v ...interface{}) {
 	}
 	var msg string
 	// to write to file
+
 	if l.prefixString != "" {
+		if l.blacklist != nil {
+			for _, v := range l.blacklist {
+				if fmt.Sprintf("%s%s%s", colorRed, strings.ToUpper(v), colorReset) == l.prefixString {
+					return
+				}
+			}
+		}
 		msg = fmt.Sprintf("[%s]", l.prefixString)
 	}
 	if l.traceCode != "" {

@@ -3,11 +3,9 @@ package logger
 import "fmt"
 
 // Log logs a message at log level
-func (l *logger) Log(a ...interface{}) LogResult {
+func (l *logger) Log(a ...interface{}) {
 	l.doLog(Log, a...)
-	return &logResult{
-		logger: l,
-	}
+
 }
 
 // Logf logs a message at log level with string formater
@@ -17,11 +15,8 @@ func (l *logger) Logf(format string, a ...interface{}) {
 }
 
 // Alert logs a message at log level
-func (l *logger) Alert(a ...interface{}) LogResult {
+func (l *logger) Alert(a ...interface{}) {
 	l.doLog(Alert, a...)
-	return &logResult{
-		logger: l,
-	}
 }
 
 // Alertf logs a message at log level with string formater
@@ -31,11 +26,8 @@ func (l *logger) Alertf(format string, a ...interface{}) {
 }
 
 // Error logs a message at log level
-func (l *logger) Error(a ...interface{}) LogResult {
+func (l *logger) Error(a ...interface{}) {
 	l.doLog(Error, a...)
-	return &logResult{
-		logger: l,
-	}
 }
 
 // Errorf logs a message at log level with string formater
@@ -45,11 +37,8 @@ func (l *logger) Errorf(format string, a ...interface{}) {
 }
 
 // Highlight logs a message at log level
-func (l *logger) Highlight(a ...interface{}) LogResult {
+func (l *logger) Highlight(a ...interface{}) {
 	l.doLog(Highlight, a...)
-	return &logResult{
-		logger: l,
-	}
 }
 
 // Highlightf logs a message at log level with string formater
@@ -59,11 +48,8 @@ func (l *logger) Highlightf(format string, a ...interface{}) {
 }
 
 // Info logs a message at log level
-func (l *logger) Info(a ...interface{}) LogResult {
+func (l *logger) Info(a ...interface{}) {
 	l.doLog(Info, a...)
-	return &logResult{
-		logger: l,
-	}
 }
 
 // Infof logs a message at log level with string formater
@@ -73,11 +59,8 @@ func (l *logger) Infof(format string, a ...interface{}) {
 }
 
 // Trace logs a message at log level
-func (l *logger) Trace(a ...interface{}) LogResult {
+func (l *logger) Trace(a ...interface{}) {
 	l.doLog(Trace, a...)
-	return &logResult{
-		logger: l,
-	}
 }
 
 // Tracef logs a message at log level with string formater
@@ -87,11 +70,8 @@ func (l *logger) Debugf(format string, a ...interface{}) {
 }
 
 // Warn logs a message at log level
-func (l *logger) Warn(a ...interface{}) LogResult {
+func (l *logger) Warn(a ...interface{}) {
 	l.doLog(Warn, a...)
-	return &logResult{
-		logger: l,
-	}
 }
 
 // Warnf logs a message at log level with string formater

@@ -45,35 +45,35 @@ type Logger interface {
 	// GetCaller return the caller of the log
 	GetCaller() *logger
 	// Log logs a message at log level
-	Log(v ...interface{}) LogResult
+	Log(v ...interface{})
 	// Logf logs a message at log level with string formater
 	Logf(format string, v ...interface{})
 	// Alert logs a message at log level
-	Alert(v ...interface{}) LogResult
+	Alert(v ...interface{})
 	// Alertf logs a message at log level with string formater
 	Alertf(format string, v ...interface{})
 	// Error logs a message at log level
-	Error(v ...interface{}) LogResult
+	Error(v ...interface{})
 	// Errorf logs a message at log level with string formater
 	Errorf(format string, v ...interface{})
 	// Highlight logs a message at log level
-	Highlight(v ...interface{}) LogResult
+	Highlight(v ...interface{})
 	// Highlightf logs a message at log level with string formater
 	Highlightf(format string, v ...interface{})
 	// Info logs a message at log level
-	Info(v ...interface{}) LogResult
+	Info(v ...interface{})
 	// Infof logs a message at log level with string formater
 	Infof(format string, v ...interface{})
 	// Trace logs a message at log level
-	Trace(v ...interface{}) LogResult
+	Trace(v ...interface{})
 	// Tracef logs a message at log level with string formater
 	Debugf(format string, v ...interface{})
 	// Warn logs a message at log level
-	Warn(v ...interface{}) LogResult
+	Warn(v ...interface{})
 	// Warnf logs a message at log level with string formater
 	Warnf(format string, v ...interface{})
 	// Set LogLevel
-	Level(level uint8) Logger
+	Level(level uint8)
 	// Set custom whitelist for development only
 	AddToWhitelist(prefix ...string)
 }
@@ -118,6 +118,7 @@ func CreateLogger(LoggerOpts *Options) Logger {
 		std:          LoggerOpts.Std,
 		stdout:       LoggerOpts.Stdout,
 		prefixString: "",
+		traceCode:    createUID(),
 	}
 	t := time.Now()
 	l.time = &t
@@ -132,9 +133,16 @@ func (l logger) Begin() Logger {
 	return l.BeginWithPrefix("")
 }
 
-func (l *logger) Level(level uint8) Logger {
-	l.LogLevel = LogLevel(level)
+// BeginWithPrefix the log with a string
+func (l *logger) BeginWithPrefix(format ...string) Logger {
+	l.prefixString = strings.Join(format, ":")
+	t := time.Now()
+	l.time = &t
 	return l
+}
+
+func (l *logger) Level(level uint8) {
+	l.LogLevel = LogLevel(level)
 }
 
 // SetCustomOut use for add custom output
@@ -149,42 +157,6 @@ func createUID() string {
 
 func (l *logger) AddToWhitelist(prefix ...string) {
 	l.whitelist = append(l.whitelist, prefix...)
-}
-
-// BeginWithPrefix the log with a string
-func (l logger) BeginWithPrefix(format ...string) Logger {
-	colorReset := "\033[0m"
-
-	colorRed := "\033[31m"
-
-	// colorYellow := "\033[33m"
-	// colorBlue := "\033[34m"
-	// colorPurple := "\033[35m"
-	// colorCyan := "\033[36m"
-	// colorWhite := "\033[37m"
-
-	clone := logger{
-		LogLevel:  l.LogLevel,
-		verbose:   l.verbose,
-		std:       l.std,
-		stdout:    l.stdout,
-		traceCode: createUID(),
-	}
-	var tmpF []string
-	for _, v := range format {
-		v = strings.ToUpper(v)
-		sv := strings.Split(v, "/")
-		tmpF = append(tmpF, sv...)
-	}
-	clone.prefixString = strings.Join(tmpF, ":")
-	clone.prefixString = fmt.Sprintf("%s%s%s", colorRed, clone.prefixString, colorReset)
-	t := time.Now()
-	clone.time = &t
-
-	if clone.verbose {
-		l.doLog(Alert, "BEGIN : ")
-	}
-	return &clone
 }
 
 // Prefix the log with a string
@@ -240,9 +212,6 @@ func (l *logger) GetCaller() *logger {
 
 // doLog send log to stdout or file
 func (l logger) doLog(level LogLevel, v ...interface{}) {
-	colorReset := "\033[0m"
-	colorRed := "\033[31m"
-	colorGreen := "\033[32m"
 	// Check log level permission :
 	// permission Nothing is not allowed to log
 	if l.LogLevel <= Nothing || level > l.LogLevel {
@@ -252,17 +221,13 @@ func (l logger) doLog(level LogLevel, v ...interface{}) {
 	// to write to file
 
 	if l.prefixString != "" {
-		if l.whitelist != nil {
-			for _, v := range l.whitelist {
-				if fmt.Sprintf("%s%s%s", colorRed, strings.ToUpper(v), colorReset) == l.prefixString {
-					return
-				}
-			}
+		if !ArrayContains[string](l.whitelist, l.prefixString) {
+			return
 		}
-		msg = fmt.Sprintf("[%s]", l.prefixString)
+		msg = fmt.Sprintf("[%s]", SetColor(l.prefixString, Red))
 	}
 	if l.traceCode != "" {
-		msg = fmt.Sprintf("%s[%s]", msg, fmt.Sprintf("%s%s%s", colorGreen, l.traceCode, colorReset))
+		msg = fmt.Sprintf("%s[%s]", msg, SetColor(l.traceCode, Blue))
 	}
 	for _, v := range v {
 		msg = fmt.Sprintf("%s%s", msg, fmt.Sprint(v))

@@ -1,28 +1,23 @@
 package main
 
 import (
-	"time"
+	"fmt"
+	"log"
 
-	logger "github.com/amupxm/xmus-logger"
+	xmuslogger "github.com/amupxm/xmus-logger"
 )
 
 func main() {
-	logOptions := logger.Options{
-		LogLevel: 6,
-		Verbose:  true,
-		Std:      true,
-	}
-	log := logger.CreateLogger(&logOptions)
-	c := log.BeginWithPrefix("main")
-	c.Errorf("asdasd %s", "asdasd")
-	time.Sleep(time.Second * 1)
-	c.GetCaller()
-	c.Errorf("asdasd %s", "asdasd")
-	c2 := log.BeginWithPrefix("main2")
-	c2.AddToWhitelist("main2")
+	logxmus := xmuslogger.New().Level(xmuslogger.DebugLevel)
+	log.SetPrefix("main")
+	ctxLogger := logxmus.With().Str("component", "main").Logger()
+	ctxLogger.Info().Msg("This is an info message")
+	ctxLogger.Debug().Msg("This is a debug message")
+	logxmus.Error().Err(fmt.Errorf("test error")).Msg("test")
+	ctxLogger.Print("Hello world")
+	anyFuncwithDefaultLogger(logxmus)
+}
 
-	c2.Errorf("asdasd %s", "asdasd")
-
-	log.End()
-
+func anyFuncwithDefaultLogger(log *xmuslogger.Logger) {
+	log.Println("This is a log message from anyFuncwithDefaultLogger")
 }

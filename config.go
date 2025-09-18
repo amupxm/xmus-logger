@@ -25,8 +25,10 @@ func (l *Logger) RemoteHTTP(endpoint string, options ...HTTPOption) *Logger {
 	return l.Remote(NewHTTPRemoteWriter(endpoint, options...))
 }
 
+// ✅ FIXED: Clone the logger before creating context
 func (l *Logger) With() *Context {
-	return &Context{logger: l}
+	clonedLogger := l.clone() // Create a copy first
+	return &Context{logger: clonedLogger}
 }
 
 func (l *Logger) SetOutput(w io.Writer) {

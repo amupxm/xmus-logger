@@ -32,6 +32,14 @@ func (e *Event) Int(key string, val int) *Event {
 	return e
 }
 
+func (e *Event) Int64(key string, val int64) *Event {
+	if e == nil {
+		return e
+	}
+	e.buf = appendInt64(e.buf, key, val)
+	return e
+}
+
 func (e *Event) Bool(key string, val bool) *Event {
 	if e == nil {
 		return e

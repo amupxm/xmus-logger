@@ -1,6 +1,9 @@
 package xmuslogger
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 type loggerWriter struct {
 	parent *Logger
@@ -10,10 +13,12 @@ func (lw *loggerWriter) Write(p []byte) (n int, err error) {
 	message := string(p)
 
 	// Extract message from standard log format
-	if len(message) > 20 && message[len(message)-1] == '\n' {
+	if len(message) > 20 {
 		if idx := findMessageStart(message); idx > 0 {
 			message = message[idx:]
 		}
+	}
+	if len(message) > 0 && message[len(message)-1] == '\n' {
 		message = message[:len(message)-1] // Remove newline
 	}
 
@@ -34,6 +39,7 @@ func (lw *loggerWriter) Write(p []byte) (n int, err error) {
 		_, err := w.Write(append(jsonBuf, '\n'))
 		if err != nil {
 			// TODO : handle error
+			Panic(err)
 		}
 	}
 
@@ -42,10 +48,13 @@ func (lw *loggerWriter) Write(p []byte) (n int, err error) {
 		if lw.parent.async {
 			if err := lw.parent.remoteWriter.WriteAsync(jsonBuf); err != nil {
 				// TODO : handle error
+				Panic(err)
 			}
 		} else {
 			if err := lw.parent.remoteWriter.Write(jsonBuf); err != nil {
 				// TODO : handle error
+				Panic(err)
+
 			}
 		}
 	}
@@ -54,14 +63,9 @@ func (lw *loggerWriter) Write(p []byte) (n int, err error) {
 }
 
 func findMessageStart(logLine string) int {
-	count := 0
-	for i, c := range logLine {
-		if c == ' ' {
-			count++
-			if count == 2 {
-				return i + 1
-			}
-		}
+	idx := strings.Index(logLine, "message")
+	if idx < 0 {
+		return 0
 	}
-	return 0
+	return idx
 }

@@ -14,6 +14,10 @@ func (c *Context) Int(key string, val int) *Context {
 	return c
 }
 
+func (c *Context) Bool(key string, val bool) *Context {
+	c.logger.context = appendBool(c.logger.context, key, val)
+	return c
+}
 func (c *Context) Logger() *Logger {
 	return c.logger
 }

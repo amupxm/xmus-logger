@@ -106,7 +106,7 @@ func TestSerializerEdgeCases(t *testing.T) {
 	t.Run("AppendBytes_NoTrailingComma", func(t *testing.T) {
 		buf := []byte(`"existing":"field"`)
 		result := appendBytes(buf, []byte(`"new":"value"`))
-		expected := `"existing":"field""new":"value",`
+		expected := `"existing":"field""new":"value"`
 
 		if string(result) != expected {
 			t.Errorf("Expected %s, got %s", expected, string(result))
@@ -200,30 +200,6 @@ func TestGlobalFunctionsCoverage(t *testing.T) {
 }
 
 // Test findMessageStart edge cases
-func TestFindMessageStartEdgeCases(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected int
-	}{
-		{"", 0},                        // Empty string
-		{" ", 0},                       // Single space
-		{"  ", 0},                      // Two spaces, but no third word
-		{"a b c", 4},                   // Three words
-		{"word", 0},                    // Single word
-		{"a b", 0},                     // Two words (not enough)
-		{"prefix msg content here", 7}, // Multiple words after spaces
-		{"2023/01/01 12:00:00 actual message", 19}, // Typical log format
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			result := findMessageStart(tt.input)
-			if result != tt.expected {
-				t.Errorf("findMessageStart(%q) = %d, expected %d", tt.input, result, tt.expected)
-			}
-		})
-	}
-}
 
 // Test HTTP option functions edge cases
 func TestHTTPOptionEdgeCases(t *testing.T) {

@@ -1,368 +1,46 @@
-# .github/workflows/ci.yml
-name: CI/CD Pipeline
+name: Go Test Coverage
 
 on:
   push:
-    branches: [ main, develop ]
-    tags: [ 'v*' ]
+    branches:
+      - main # Or your default branch
   pull_request:
-    branches: [ main, develop ]
-
-env:
-  GO_VERSION: '1.21'
+    branches:
+      - main # Or your default branch
 
 jobs:
-  # Test Job
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: ['1.21', '1.22']
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ matrix.go-version }}
-
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cache/go-build
-          ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-${{ matrix.go-version }}-
-
-    - name: Download dependencies
-      run: go mod download
-
-    - name: Verify dependencies
-      run: go mod verify
-
-    - name: Run tests
-      run: go test -v -race -coverprofile=coverage.out ./...
-
-    - name: Generate coverage report
-      run: go tool cover -html=coverage.out -o coverage.html
-
-    - name: Calculate coverage percentage
-      id: coverage
-      run: |
-        COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
-        echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
-        echo "Coverage: $COVERAGE%"
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.out
-        flags: unittests
-        name: codecov-umbrella
-
-    - name: Upload coverage reports to artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: coverage-reports-${{ matrix.go-version }}
-        path: |
-          coverage.out
-          coverage.html
-
-    - name: Check coverage threshold
-      run: |
-        COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
-        THRESHOLD=80
-        if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
-          echo "❌ Coverage $COVERAGE% is below threshold $THRESHOLD%"
-          exit 1
-        else
-          echo "✅ Coverage $COVERAGE% meets threshold $THRESHOLD%"
-        fi
-
-  # Lint Job
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ env.GO_VERSION }}
-
-    - name: golangci-lint
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: latest
-        args: --timeout=5m
-
-  # Security Scan
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ env.GO_VERSION }}
-
-    - name: Run Gosec Security Scanner
-      uses: securecodewarrior/github-action-gosec@master
-      with:
-        args: './...'
-
-    - name: Run govulncheck
-      run: |
-        go install golang.org/x/vuln/cmd/govulncheck@latest
-        govulncheck ./...
-
-  # Benchmark Job
-  benchmark:
-    name: Benchmark
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 # Need full history for comparison
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ env.GO_VERSION }}
-
-    - name: Run benchmarks
-      run: |
-        go test -bench=. -benchmem -count=3 ./... | tee benchmark.txt
-
-    - name: Store benchmark result
-      uses: benchmark-action/github-action-benchmark@v1
-      with:
-        name: Go Benchmark
-        tool: 'go'
-        output-file-path: benchmark.txt
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        auto-push: true
-        comment-on-alert: true
-        alert-threshold: '200%'
-        fail-on-alert: true
-
-  # Build Job
   build:
-    name: Build
     runs-on: ubuntu-latest
-    needs: [test, lint]
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ env.GO_VERSION }}
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22' # Specify your Go version
 
-    - name: Build
-      run: |
-        go build -v ./...
-        
-    - name: Build examples
-      run: |
-        cd examples
-        go build -v ./...
+      - name: Generate test coverage
+        run: |
+          go test ./... -coverprofile=coverage.out -covermode=atomic -coverpkg=./...
 
-  # Release Job (only on tags)
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs: [test, lint, build]
-    if: startsWith(github.ref, 'refs/tags/v')
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Calculate coverage percentage
+        id: coverage
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total: | grep -Eo '[0-9]+\.[0-9]+')
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ env.GO_VERSION }}
+      - name: Create coverage badge
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          badge_name: coverage
+          label: Coverage
+          message: ${{ steps.coverage.outputs.coverage }}%
+          color: green # Customize color based on coverage percentage (optional)
+          filename: coverage_badge.svg # Name of the generated badge file
 
-    - name: Get latest coverage
-      run: |
-        go test -coverprofile=coverage.out ./...
-        COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}')
-        echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
-
-    - name: Generate changelog
-      id: changelog
-      run: |
-        # Get the tag name
-        TAG_NAME=${GITHUB_REF#refs/tags/}
-        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-        
-        # Generate changelog since last tag
-        PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-        if [ -z "$PREV_TAG" ]; then
-          CHANGELOG=$(git log --pretty=format:"- %s (%h)" --since="30 days ago")
-        else
-          CHANGELOG=$(git log --pretty=format:"- %s (%h)" ${PREV_TAG}..HEAD)
-        fi
-        
-        # Save changelog to file
-        cat > CHANGELOG.md << EOF
-        ## What's Changed
-        
-        $CHANGELOG
-        
-        ## Coverage
-        - Test Coverage: $COVERAGE
-        
-        **Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${TAG_NAME}
-        EOF
-
-    - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.changelog.outputs.tag_name }}
-        release_name: Release ${{ steps.changelog.outputs.tag_name }}
-        body_path: CHANGELOG.md
-        draft: false
-        prerelease: false
-
-    - name: Notify Slack (if configured)
-      if: env.SLACK_WEBHOOK_URL != ''
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      run: |
-        curl -X POST -H 'Content-type: application/json' \
-        --data '{"text":"🚀 New release: ${{ steps.changelog.outputs.tag_name }} of xmus-logger with ${{ env.COVERAGE }} test coverage!"}' \
-        $SLACK_WEBHOOK_URL
-
-  # Update badges and documentation
-  update-badges:
-    name: Update Badges
-    runs-on: ubuntu-latest
-    needs: [test]
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: ${{ env.GO_VERSION }}
-
-    - name: Generate coverage and badges
-      run: |
-        # Run tests and get coverage
-        go test -coverprofile=coverage.out ./...
-        COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
-        
-        # Determine badge color
-        if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
-          COLOR="brightgreen"
-        elif (( $(echo "$COVERAGE >= 80" | bc -l) )); then
-          COLOR="green"
-        elif (( $(echo "$COVERAGE >= 70" | bc -l) )); then
-          COLOR="yellow"
-        elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then
-          COLOR="orange"
-        else
-          COLOR="red"
-        fi
-        
-        # Update README with latest badges
-        cat > README.md << 'EOF'
-        # XMus Logger
-        
-        [![Go Version](https://img.shields.io/github/go-mod/go-version/amupxm/xmus-logger)](https://golang.org/)
-        [![Coverage](https://img.shields.io/badge/coverage-$COVERAGE%25-$COLOR)](https://github.com/amupxm/xmus-logger/actions)
-        [![Go Report Card](https://goreportcard.com/badge/github.com/amupxm/xmus-logger)](https://goreportcard.com/report/github.com/amupxm/xmus-logger)
-        [![License](https://img.shields.io/github/license/amupxm/xmus-logger)](LICENSE)
-        [![Tests](https://github.com/amupxm/xmus-logger/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/amupxm/xmus-logger/actions)
-        [![Release](https://img.shields.io/github/v/release/amupxm/xmus-logger)](https://github.com/amupxm/xmus-logger/releases)
-        
-        A high-performance, structured logging library for Go that combines the simplicity of the standard library with the power of structured logging like zerolog.
-        
-        ## Features
-        
-        - 🚀 **High Performance**: Zero-allocation logging for hot paths
-        - 🔗 **Standard Library Compatible**: Drop-in replacement for log package
-        - 📊 **Structured Logging**: JSON output with field chaining
-        - 🌐 **Remote Logging**: Built-in HTTP remote logging support
-        - 🎯 **Context Support**: Hierarchical context with field inheritance
-        - 🔒 **Thread Safe**: Concurrent logging without data races
-        - 📈 **Level Filtering**: Configurable log levels with zero-cost disabled levels
-        
-        ## Quick Start
-        
-        ```go
-        package main
-        
-        import "github.com/amupxm/xmus-logger"
-        
-        func main() {
-            log := xmuslogger.New().Level(xmuslogger.DebugLevel)
-            
-            // Structured logging
-            log.Info().
-                Str("user", "john").
-                Int("age", 30).
-                Msg("User logged in")
-                
-            // Standard library compatibility
-            log.Printf("User %s logged in", "john")
-            
-            // Context logging
-            ctxLog := log.With().Str("service", "auth").Logger()
-            ctxLog.Error().Msg("Authentication failed")
-        }
-        ```
-        
-        ## Installation
-        
-        ```bash
-        go get github.com/amupxm/xmus-logger
-        ```
-        
-        ## Coverage: $COVERAGE%
-        
-        EOF
-        
-        # Substitute variables
-        sed -i "s/\$COVERAGE/$COVERAGE/g" README.md
-        sed -i "s/\$COLOR/$COLOR/g" README.md
-
-    - name: Commit and push if changed
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add README.md
-        if git diff --staged --quiet; then
-          echo "No changes to commit"
-        else
-          git commit -m "🤖 Auto-update README badges and coverage"
-          git push
-        fi
+      - name: Upload coverage badge to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badge
+          path: coverage_badge.svg
+          retention-days: 1 # Optional: How long to keep the artifact

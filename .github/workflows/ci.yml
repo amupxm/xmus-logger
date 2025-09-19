@@ -1,0 +1,46 @@
+name: Go Test Coverage
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+  pull_request:
+    branches:
+      - main # Or your default branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22' # Specify your Go version
+
+      - name: Generate test coverage
+        run: |
+          go test ./... -coverprofile=coverage.out -covermode=atomic -coverpkg=./...
+
+      - name: Calculate coverage percentage
+        id: coverage
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total: | grep -Eo '[0-9]+\.[0-9]+')
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+
+      - name: Create coverage badge
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          badge_name: coverage
+          label: Coverage
+          message: ${{ steps.coverage.outputs.coverage }}%
+          color: green # Customize color based on coverage percentage (optional)
+          filename: coverage_badge.svg # Name of the generated badge file
+
+      - name: Upload coverage badge to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badge
+          path: coverage_badge.svg
+          retention-days: 1 # Optional: How long to keep the artifact
